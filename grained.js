@@ -4,90 +4,143 @@
 * GitHub : https://github.com/sarathsaleem/grained
 * v0.0.1
 */
-/**
- *
- * @param { HTMLElement } elm - HTML элемент
- * @param {
- * { animate: Boolean,
-    patternWidth: Number,
-    patternHeight: Number,
-    grainOpacity: Number,
-    grainDensity: Number,
-    grainWidth: Number,
-    grainHeight: Number,
-    grainChaos: Number,
-    grainSpeed: Number}
-    } opt - Опции
- */
-function grained(elm, opt) {
-  function getElementSelector(el) {
-    const tag = el.tagName.toLowerCase();
-    const { id } = el;
-    const cssClass = el.className.split(' ').join('.');
 
-    return `${tag}${id ? `#${id}` : ''}${cssClass ? `.${cssClass}` : ''}`;
-  }
-
-  const element = elm; // элемент
-  const selectorElement = getElementSelector(element); // css селектор элемента
-
-  // если элемент отсутсвует, то заканчиваем выполнение
-  if (!element) {
-    console.error(`Grained: cannot find the element with id ${elm}`);
-    return;
-  }
-
-  // SET STYLE FOR PARENT
+// eslint-disable-next-line max-classes-per-file
+class ParentStyle {
+  // ### СТИЛИ ДЛЯ РОДИТЕЛЯ ### //
   // проверяем какое значение у position, если оно есть
-  const checkPosition = (el) => {
+  static shouldSetPosition(parentElm) {
     const forbidden = ['absolute', 'fixed', 'relative', 'sticky'];
     const isAllow = (val) => !forbidden.some((pos) => pos === val);
-    const getCssPosition = () => getComputedStyle(el).getPropertyValue('position');
+    const getCssPosition = () => getComputedStyle(parentElm).getPropertyValue('position');
 
-    return isAllow(el.style.position) && isAllow(getCssPosition());
-  };
+    return isAllow(parentElm.style.position) && isAllow(getCssPosition());
+  }
 
   // Задаем базовые стили для элемента
-  const addElmStyles = () => {
+  static addStyles(parentElm) {
     // если position не задано, то задаем
-    if (checkPosition(element)) {
-      element.style.position = 'relative';
+    if (this.shouldSetPosition(parentElm)) {
+      // eslint-disable-next-line no-param-reassign
+      parentElm.style.position = 'relative';
     }
 
-    element.style.overflow = 'hidden';
-  };
+    // eslint-disable-next-line no-param-reassign
+    parentElm.style.overflow = 'hidden';
+  }
+}
 
-  addElmStyles();
+class Animation {
+  static get keyFrames() {
+    return [
+      {
+        step: '0%',
+        translate: '-10%,10%',
+      },
+      {
+        step: '10%',
+        translate: '-25%,0%',
+      },
+      {
+        step: '20%',
+        translate: '-30%,10%',
+      },
+      {
+        step: '30%',
+        translate: '-30%,30%',
+      },
+      {
+        step: '40%',
+        translate: ':-20%,20%',
+      },
+      {
+        step: '50%',
+        translate: '-15%,10%',
+      },
+      {
+        step: '60%',
+        translate: '-20%,20%',
+      },
+      {
+        step: '70%',
+        translate: '-5%,20%',
+      },
+      {
+        step: '80%',
+        translate: '-25%,5%',
+      },
+      {
+        step: '90%',
+        translate: '-30%,25%',
+      },
+      {
+        step: '100%',
+        translate: '-10%,10%',
+      },
+    ];
+  }
 
-  // DEFAULT OPTION VALUES
-  let options = {
-    animate: true,
-    patternWidth: 100,
-    patternHeight: 100,
-    grainOpacity: 0.1,
-    grainDensity: 1,
-    grainWidth: 1,
-    grainHeight: 1,
-    grainChaos: 0.5,
-    grainSpeed: 20,
-  };
+  /**
+   * Создаем css keyframe
+   * @param { [{step: string, translate: string}] } frames - Список "шагов" со значениями translate
+   * @returns {string}
+   */
+  static createKeyframes(frames) {
+    let steps = '';
 
-  // TODO: Нужно проверить
-  if (opt && typeof opt === 'object') {
-    options = { ...options, ...opt };
+    frames.forEach(({ step, translate }) => {
+      steps += `${step} { transform: translate(${translate}); }`;
+    });
+
+    return `@keyframes grained {${steps}}`;
+  }
+
+  static create() {
+    // Добавляем элемент style в документ
+    const style = document.createElement('style');
+    style.id = 'grained-animation';
+    style.dataset.grainedAnimation = '';
+    style.innerHTML = this.createKeyframes(this.keyFrames);
+    document.body.appendChild(style);
+  }
+
+  static add() {
+    // Сама анимация не меняется - она всегда одинаковая.
+    // Так что не вижу смысла удалять элемент, если он уже есть.
+    // Лучше добавить data-атрибут, чтобы было понятно что это не пользователь создал
+    const isExist = document.querySelector('[data-grained-animation]');
+    if (!isExist) {
+      this.create();
+    }
+  }
+}
+
+class Noise {
+  static getRule(noiseImg, grainChaos, grainSpeed) {
+    return `
+      content: "";
+      position: absolute;
+      top: -100%;
+      left: -100%;
+      width: 300%;
+      height: 300%;
+      background-image: url(${noiseImg});
+      animation-name:grained;
+      animation-iteration-count: infinite;
+      animation-duration: ${grainChaos}s;
+      animation-timing-function: steps(${grainSpeed}, end);
+    `;
   }
 
   /**
    * Генерирует изображение с "шумом" из канваса
    * @returns {string} - base64 png изображение
    */
-  const generateNoise = () => {
+  static generateNoise(options) {
     const canvas = document.createElement('canvas'); // создаем элемент
     const ctx = canvas.getContext('2d'); // задаем контекст
 
-    /** @type {number} */
     canvas.width = options.patternWidth; // задаем размер
-    /** @type {number} */
     canvas.height = options.patternHeight; // задаем размер
 
     // ~~~***~~~
@@ -108,7 +161,7 @@ function grained(elm, opt) {
     }
 
     return canvas.toDataURL('image/png');
-  };
+  }
 
   /**
    * Добавляем css стили для псевдо-элемента
@@ -117,7 +170,7 @@ function grained(elm, opt) {
    * @param {string} rules - css стили
    * @param {number=} index - индекс, не используется
    */
-  function addCSSRule(sheet, selector, rules, index) {
+  static addCSSRule(sheet, selector, rules, index) {
     let rule = '';
 
     if (selector.length) {
@@ -129,117 +182,86 @@ function grained(elm, opt) {
     sheet.insertRule(rule, index);
   }
 
-  /** @type {string} */
-  const noise = generateNoise();
+  static isExist(selector) {
+    // Если такой стиль уже существует, то удаляем.
+    // Но это маловероятно. Возможно можно удалить.
+    const styleAdded = document.querySelector(`#grained-animation__${selector}`);
 
-  /**
-   * Создаем css keyframe
-   * @param { [{step: string, translate: string}] } frames - Список "шагов" со значениями translate
-   * @returns {string}
-   */
-  const createKeyframes = (frames) => {
-    let steps = '';
+    if (styleAdded) {
+      styleAdded.parentElement.removeChild(styleAdded);
+    }
+  }
 
-    frames.forEach(({ step, translate }) => {
-      steps += `${step} { transform: translate(${translate}); }`;
-    });
-
-    return `@keyframes grained {${steps}}`;
-  };
-
-  const keyFrames = [
-    {
-      step: '0%',
-      translate: '-10%,10%',
-    },
-    {
-      step: '10%',
-      translate: '-25%,0%',
-    },
-    {
-      step: '20%',
-      translate: '-30%,10%',
-    },
-    {
-      step: '30%',
-      translate: '-30%,30%',
-    },
-    {
-      step: '40%',
-      translate: ':-20%,20%',
-    },
-    {
-      step: '50%',
-      translate: '-15%,10%',
-    },
-    {
-      step: '60%',
-      translate: '-20%,20%',
-    },
-    {
-      step: '70%',
-      translate: '-5%,20%',
-    },
-    {
-      step: '80%',
-      translate: '-25%,5%',
-    },
-    {
-      step: '90%',
-      translate: '-30%,25%',
-    },
-    {
-      step: '100%',
-      translate: '-10%,10%',
-    },
-  ];
-  const animation = createKeyframes(keyFrames);
-
-  // add animation keyframe
-  // Сама анимация не меняется - она всегда одинаковая.
-  // Так что не вижу смысла удалять элемент, если он уже есть.
-  // Лучше добавить data-атрибут, чтобы было понятно что это не пользователь создал
-  const animationAdded = document.querySelector('[data-grained-animation]');
-  if (!animationAdded) {
-    // Добавляем элемент style в документ
+  static createStyle(selector) {
+    // Добавляется элемент style
     const style = document.createElement('style');
-    style.id = 'grained-animation';
-    style.dataset.grainedAnimation = '';
-    style.innerHTML = animation;
+    style.id = `grained-animation__${selector}`;
     document.body.appendChild(style);
+    return style;
   }
 
-  // add custimozed style
-  // Если такой стиль уже существует, то удаляем.
-  // Но это маловероятно. Возможно можно удалить.
-  const styleAdded = document.querySelector(`#grained-animation__${selectorElement}`);
+  static add(selector, options) {
+    this.isExist(selector);
 
-  if (styleAdded) {
-    styleAdded.parentElement.removeChild(styleAdded);
+    const style = this.createStyle(selector);
+    const rule = this.getRule(this.generateNoise(options), options.grainChaos, options.grainSpeed);
+    this.addCSSRule(style.sheet, `${selector}::before`, rule);
   }
-
-  // Добавляется элемент style
-  const style = document.createElement('style');
-  style.id = `grained-animation__${selectorElement}`;
-  document.body.appendChild(style);
-
-  const rule = `
-    content: "";
-    position: absolute;
-    top: -100%;
-    left: -100%;
-    width: 300%;
-    height: 300%;
-    background-image: url(${noise});
-    animation-name:grained;
-    animation-iteration-count: infinite;
-    animation-duration: ${options.grainChaos}s;
-    animation-timing-function: steps(${options.grainSpeed}, end);
-  `;
-
-  // selecter element to add grains
-  addCSSRule(style.sheet, `${selectorElement}::before`, rule);
-// END
 }
 
-export default grained;
+/**
+ *
+ * @param { string } elmSelector - css селектор
+ * @param {
+ * { animate: Boolean,
+    patternWidth: Number,
+    patternHeight: Number,
+    grainOpacity: Number,
+    grainDensity: Number,
+    grainWidth: Number,
+    grainHeight: Number,
+    grainChaos: Number,
+    grainSpeed: Number}
+    } opt - Опции
+ */
+
+class Grained {
+  constructor(selector = '', opt = {}) {
+    this.$parent = document.querySelector(selector); // элемент
+    if (!this.$parent) {
+      // если элемент отсутсвует, то заканчиваем выполнение
+      console.error(`Grained: cannot find the element with selector ${selector}`);
+      return;
+    }
+    this.selector = this.getCSSSelector(); // css селектор элемента
+    this.options = opt && typeof opt === 'object' ? { ...this.defaultOptions, ...opt } : this.defaultOptions;
+
+    ParentStyle.addStyles(this.$parent);
+    Animation.add();
+    Noise.add(this.selector, this.options);
+  }
+
+  get defaultOptions() {
+    return {
+      animate: true,
+      patternWidth: 100,
+      patternHeight: 100,
+      grainOpacity: 0.1,
+      grainDensity: 1,
+      grainWidth: 1,
+      grainHeight: 1,
+      grainChaos: 0.5,
+      grainSpeed: 20,
+    };
+  }
+
+  getCSSSelector() {
+    const tag = this.$parent.tagName.toLowerCase();
+    const { id } = this.$parent;
+    const cssClass = this.$parent.className.split(' ').join('.');
+
+    return `${tag}${id ? `#${id}` : ''}${cssClass ? `.${cssClass}` : ''}`;
+  }
+}
+
+export default Grained;

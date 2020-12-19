@@ -2,7 +2,7 @@
 Add animated grain texture effect to your content.
 --------------------------------------------------
 
-With **grained.js** you can add customized noise effect on your web page. It has easily customizable options to generate the animated noise effect.
+With **Grained.js** you can add customized noise effect on your web page. It has easily customizable options to generate the animated noise effect.
 The animation is added using CSS3 key-frame animation and instantly generated png noise image.
 
 [!["Create your own"](http://sarathsaleem.github.io/grained/img/textute-list.gif)](http://sarathsaleem.github.io/grained)
@@ -14,7 +14,7 @@ How to use
 
 Include the library file in your html page.
 
-    <script src="grained.js"></script>
+    <script src="Grained.js"></script>
 
 initialize the library by
 

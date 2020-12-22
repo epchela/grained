@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Test</title>
+</head>
+<style>
+  body {
+    margin: 0;
+  }
+
+  .main {
+    height: 100vh;
+    padding: 2em;
+  }
+
+  .fixed {
+    position: fixed;
+    top: 50%;
+    transform: translateY(-50%);
+    left: 0;
+    width: 50%;
+    padding: 2em;
+    background-color: darkgoldenrod;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    body {
+      background-color: #222;
+    }
+  }
+</style>
+<body>
+<div id="main" class="main">
+  <h1>Hello, Grained!</h1>
+  <p><span>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Accusamus commodi dolores impedit laborum odio voluptate. Cum, numquam suscipit? Architecto dolorum ea eum ipsa iste minus nesciunt obcaecati sed suscipit voluptate?</span><span>Ab aliquam aliquid consectetur cumque earum eius, error illum iste iusto laboriosam non officiis perferendis reprehenderit similique unde voluptatem voluptatum. Esse itaque, necessitatibus. Adipisci aspernatur blanditiis, illum repellat sequi ullam!</span><span>A ab aliquid amet architecto blanditiis cum deleniti dicta dolores eius ex ipsam iure iusto magnam neque omnis placeat provident quas quia quos reiciendis, rem sit soluta tempora vitae voluptates.</span><span>Adipisci alias aperiam aspernatur corporis dolore et libero, magnam nulla porro sapiente sint ullam veritatis voluptatem. Aut corporis deleniti deserunt dolorem expedita laboriosam laudantium nam numquam, pariatur perferendis reiciendis, rerum.</span><span>Aperiam blanditiis doloribus error, excepturi fugit itaque laboriosam recusandae reprehenderit similique veniam. Blanditiis consectetur est modi nisi provident quia unde voluptatum? Cumque cupiditate dicta doloremque harum necessitatibus, perferendis quibusdam sit.</span>
+  </p>
+</div>
+
+<div class="fixed">
+  <h2>Fixed element</h2>
+  <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aperiam blanditiis commodi cumque dicta eaque illo,
+    inventore molestias necessitatibus nesciunt pariatur placeat quaerat quia reiciendis repellat sint suscipit
+    voluptate voluptatem voluptates!</p>
+</div>
+
+<script src="./grained.js"></script>
+<script>
+  grained('.main', {})
+</script>
+<script type="module">
+  import grained from './grained.esm.js';
+
+  grained('.fixed', {})
+</script>
+</body>
+</html>

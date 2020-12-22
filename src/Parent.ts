@@ -1,9 +1,9 @@
+// Устанавливаем стили родителя
 class Parent {
-  // ### СТИЛИ ДЛЯ РОДИТЕЛЯ ### //
   // проверяем какое значение у position, если оно есть
   private static shouldSetPosition(parentElm: HTMLElement): boolean {
     const forbidden = ['absolute', 'fixed', 'relative', 'sticky'];
-    const isAllow = (val : string) => !forbidden.some((pos) => pos === val);
+    const isAllow = (val: string) => !forbidden.some((pos) => pos === val);
     const getCssPosition = () => getComputedStyle(parentElm).getPropertyValue('position');
 
     return isAllow(parentElm.style.position) && isAllow(getCssPosition());

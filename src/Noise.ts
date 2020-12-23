@@ -1,7 +1,12 @@
 import * as Types from './types';
 
 export class Noise {
-  private static getRule(noiseImg: string, grainChaos: number, grainSpeed: number): string {
+  private static getRule(
+    noiseImg: string,
+    hasAnimation: boolean,
+    grainChaos: number,
+    grainSpeed: number,
+  ): string {
     return `
       content: "";
       position: absolute;
@@ -10,10 +15,10 @@ export class Noise {
       width: 300%;
       height: 300%;
       background-image: url(${noiseImg});
-      animation-name:grained;
+      ${hasAnimation && `animation-name:grained;
       animation-iteration-count: infinite;
       animation-duration: ${grainChaos}s;
-      animation-timing-function: steps(${grainSpeed}, end);
+      animation-timing-function: steps(${grainSpeed}, end);`}
     `;
   }
 
@@ -91,6 +96,7 @@ export class Noise {
     const sheet = style.sheet!;
     const rule = this.getRule(
       this.generateNoise(options),
+      options.animate,
       options.grainChaos,
       options.grainSpeed,
     );

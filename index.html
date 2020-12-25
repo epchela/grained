@@ -1,5 +1,6 @@
 <!doctype html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport"
@@ -7,14 +8,17 @@
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>Generate animated noise texture with grained.js</title>
   <style>
-    html, body {
+    html,
+    body {
       height: 100%;
     }
+
     body {
       display: flex;
       justify-content: center;
       align-items: center;
       margin: 0;
+      font-family: "Roboto Mono", "Source Code Pro", Menlo, Courier, monospace;
     }
 
     .btn-download {
@@ -36,13 +40,32 @@
       background-color: #1b61e4;
     }
 
+    .output {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+
+      padding: 16px;
+
+      color: rgba(200,202,208,0.8);
+      background-color: #2f3137;
+      border-radius: 6px;
+    }
+
     .tp-dfwv {
+      left: 8px;
+      right: auto !important;
       width: auto !important;
     }
   </style>
 </head>
+
 <body>
 <a class="btn-download" href="" download="grained-texture.png">Download as png</a>
+
+<div class="output"></div>
+
 <script src="./main.js"></script>
 </body>
+
 </html>

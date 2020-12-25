@@ -1,6 +1,24 @@
 import Tweakpane from 'tweakpane';
 import grained from './grained';
 
+const createOutput = (params) => {
+  const output = document.querySelector('.output');
+
+  let code = '<pre><code>const options = \{</code></pre>';
+
+  for (const paramsKey in params) {
+    let value = params[paramsKey];
+    value = paramsKey === 'grainOpacity' || paramsKey === 'grainDensity' ? value.toFixed(2) : value;
+
+    if (paramsKey !== 'background') {
+      code += `<pre><code>  ${paramsKey}: ${value},</code></pre>`;
+    }
+  }
+
+  code += '<pre><code>}</code></pre>';
+
+  output.innerHTML = code;
+}
 const setDownloadLink = () => {
   const backgroundImage = document.querySelector('body style:not([data-grained-animation])').sheet.cssRules[0].style.backgroundImage;
 
@@ -10,6 +28,7 @@ const setDownloadLink = () => {
 const initGrained = () => {
   grained('body', PARAMS);
   setDownloadLink();
+  createOutput(PARAMS)
 };
 
 const $elm = document.querySelector('body');
@@ -41,8 +60,9 @@ for (const paramsKey in PARAMS) {
       break;
     default:
       pane.addInput(PARAMS, paramsKey, {
-        min: 0.1,
-        max: value < 1 ? 1 : value < 100 ? 10 : 500
+        min: paramsKey === 'grainOpacity' ? 0 : 0.1,
+        max: value < 1 ? 1 : value < 100 ? 10 : 500,
+        step: paramsKey === 'grainOpacity' || paramsKey === 'grainDensity' ? 0.01 : 1
       });
   }
 }
